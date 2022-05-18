@@ -1,0 +1,9 @@
+- id: unused-java-imports
+  name: Remove unused Java imports
+  entry: unused-java-imports
+  require_serial: true
+  language: python
+  language_version: python3
+  types_or: [java]
+  args: ["--fix"]
+  minimum_pre_commit_version: "2.9.2"
