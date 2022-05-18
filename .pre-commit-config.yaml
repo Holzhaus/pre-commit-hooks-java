@@ -1,0 +1,63 @@
+default_language_version:
+  python: python3
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.2.0
+    hooks:
+      - id: check-case-conflict
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-toml
+      - id: check-xml
+      - id: check-yaml
+      - id: destroyed-symlinks
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: fix-byte-order-marker
+      - id: forbid-new-submodules
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+        exclude: ^literature/.*\.txt$
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.1.0
+    hooks:
+      - id: codespell
+        args:
+          [
+            --ignore-words=.codespellignore,
+            --exclude-file=.codespellignorelines,
+          ]
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v2.6.0
+    hooks:
+      - id: prettier
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.4.0
+    hooks:
+      - id: markdownlint-cli2
+  - repo: https://github.com/jorisroovers/gitlint
+    rev: v0.17.0
+    hooks:
+      - id: gitlint
+  - repo: https://github.com/Holzhaus/sourceheaders
+    rev: v0.0.1
+    hooks:
+      - id: sourceheaders
+        types: [python]
+  - repo: https://github.com/kumaraditya303/mirrors-pyright
+    rev: v1.1.247
+    hooks:
+      - id: pyright
+  - repo: https://github.com/PyCQA/flake8
+    rev: 4.0.1
+    hooks:
+      - id: flake8
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.10.1
+    hooks:
+      - id: isort
+  - repo: https://github.com/psf/black
+    rev: 22.3.0
+    hooks:
+      - id: black

@@ -1,0 +1,9 @@
+[general]
+license = "MPL-2.0"
+header_template = """\
+Copyright (c) {year} {copyright_holder}
+
+{license_text}
+"""
+copyright_holder = "Jan Holthuis <jan.holthuis@ruhr-uni-bochum.de>"
+prefer_inline = true
