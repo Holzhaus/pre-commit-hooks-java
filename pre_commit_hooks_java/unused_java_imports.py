@@ -22,11 +22,11 @@ class JavaImport(typing.NamedTuple):
     lineno: int
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self.match.group("name")
 
     @property
-    def identifier(self):
+    def identifier(self) -> str:
         return self.name.rpartition(".")[2]
 
 
