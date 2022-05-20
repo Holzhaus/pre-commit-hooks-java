@@ -14,7 +14,9 @@ import pathlib
 import re
 import typing
 
-IMPORT_PATTERN = re.compile(r"import\s+(?P<name>\w+\.[\w\.]*\w+)\s*;")
+IMPORT_PATTERN = re.compile(
+    r"import\s+(?P<static>(?:static\s+)?)(?P<name>\w+\.[\w\.]*\w+)\s*;"
+)
 
 
 class JavaImport(typing.NamedTuple):
@@ -24,6 +26,10 @@ class JavaImport(typing.NamedTuple):
     @property
     def name(self) -> str:
         return self.match.group("name")
+
+    @property
+    def is_static(self) -> bool:
+        return bool(self.match.group("static"))
 
     @property
     def identifier(self) -> str:
@@ -48,9 +54,17 @@ def find_unused_imports(path: pathlib.Path) -> typing.Iterable[JavaImport]:
             if match := IMPORT_PATTERN.match(line):
                 java_import = JavaImport(match, lineno)
                 unused_imports[java_import.identifier] = java_import
-                logger.debug(
-                    "%s:%d: Found import '%s'", str(path), lineno, java_import.name
-                )
+                if java_import.is_static:
+                    logger.debug(
+                        "%s:%d: Found static import '%s'",
+                        str(path),
+                        lineno,
+                        java_import.name,
+                    )
+                else:
+                    logger.debug(
+                        "%s:%d: Found import '%s'", str(path), lineno, java_import.name
+                    )
                 continue
 
             for identifier, java_import in unused_imports.copy().items():
@@ -110,9 +124,10 @@ def main(argv=None):
     for path in args.file:
         unused_imports = list(find_unused_imports(path))
         for unused_import in unused_imports:
+            import_type = "static import" if unused_import.is_static else "import"
             print(
-                "%s:%d: Unused import '%s'"
-                % (str(path), unused_import.lineno, unused_import.name)
+                "%s:%d: Unused %s '%s'"
+                % (str(path), unused_import.lineno, import_type, unused_import.name)
             )
 
         if unused_imports and args.fix:
