@@ -1,5 +1,5 @@
 - id: unused-java-imports
-  name: Remove unused Java imports
+  name: remove unused Java imports
   entry: unused-java-imports
   require_serial: true
   language: python
