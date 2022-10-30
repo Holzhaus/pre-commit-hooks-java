@@ -101,10 +101,8 @@ def lines_with_unused_imports_removed(
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="Add vim modelines to files.")
-    parser.add_argument(
-        "file", nargs="+", type=pathlib.Path, help="file path(s) to add modelines to"
-    )
+    parser = argparse.ArgumentParser(description="Check Java imports.")
+    parser.add_argument("file", nargs="+", type=pathlib.Path, help="file path(s)")
     parser.add_argument(
         "-v",
         "--verbose",
