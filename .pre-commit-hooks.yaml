@@ -1,3 +1,9 @@
+- id: check-java-package-statements
+  name: check Java package statements
+  entry: check-java-package-statements
+  language: python
+  language_version: python3
+  types_or: [java]
 - id: unused-java-imports
   name: remove unused Java imports
   entry: unused-java-imports

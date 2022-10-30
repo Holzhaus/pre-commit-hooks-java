@@ -5,6 +5,8 @@ Java code.
 
 ## Hooks
 
+- `check-java-package-statements` - Checks if a package statement is present
+  and matches the filesystem path
 - `unused-java-imports` - Removes unused imports from Java source files
 
 ## Usage
@@ -15,6 +17,7 @@ Add the following lines to your `.pre-commit-config.yaml`:
 - repo: https://github.com/Holzhaus/pre-commit-hooks-java
   rev: ""
   hooks:
+    - id: check-java-package-statements
     - id: unused-java-imports
 ```
 
