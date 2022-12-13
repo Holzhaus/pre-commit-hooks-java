@@ -8,6 +8,7 @@
 # SPDX-License-Identifier: MPL-2.0
 
 import argparse
+import enum
 import itertools
 import logging
 import pathlib
@@ -19,9 +20,15 @@ IMPORT_PATTERN = re.compile(
 )
 
 
+class RemovalReason(enum.Enum):
+    DUPLICATE = 1
+    UNUSED = 2
+
+
 class JavaImport(typing.NamedTuple):
     match: re.Match
     lineno: int
+    removal_reason: RemovalReason
 
     @property
     def name(self) -> str:
@@ -52,10 +59,11 @@ def find_unnecessary_imports(path: pathlib.Path) -> typing.Iterable[JavaImport]:
                 continue
 
             if match := IMPORT_PATTERN.match(line):
-                java_import = JavaImport(match, lineno)
+                java_import = JavaImport(match, lineno, RemovalReason.UNUSED)
                 if (
                     first_import := unused_imports.get(java_import.identifier)
                 ) is not None:
+                    java_import = JavaImport(match, lineno, RemovalReason.DUPLICATE)
                     logger.debug(
                         "%s:%d: Found duplicate import '%s' "
                         "(already imported in line %d)",
@@ -137,11 +145,17 @@ def main(argv=None):
         unnecessary_imports = list(find_unnecessary_imports(path))
         for unnecessary_import in unnecessary_imports:
             import_type = "static import" if unnecessary_import.is_static else "import"
+            removal_reason = (
+                "Unused"
+                if unnecessary_import.removal_reason == RemovalReason.UNUSED
+                else "Duplicate"
+            )
             print(
-                "%s:%d: Unnecessary %s '%s'"
+                "%s:%d: %s %s '%s'"
                 % (
                     str(path),
                     unnecessary_import.lineno,
+                    removal_reason,
                     import_type,
                     unnecessary_import.name,
                 )
