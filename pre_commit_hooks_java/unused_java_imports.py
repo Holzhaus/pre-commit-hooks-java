@@ -36,7 +36,7 @@ class JavaImport(typing.NamedTuple):
         return self.name.rpartition(".")[2]
 
 
-def find_unused_imports(path: pathlib.Path) -> typing.Iterable[JavaImport]:
+def find_unnecessary_imports(path: pathlib.Path) -> typing.Iterable[JavaImport]:
     logger = logging.getLogger(__name__)
     unused_imports: dict[str, JavaImport] = {}
     inside_comment = False
@@ -94,13 +94,13 @@ def find_unused_imports(path: pathlib.Path) -> typing.Iterable[JavaImport]:
         yield from unused_imports.values()
 
 
-def lines_with_unused_imports_removed(
-    path: pathlib.Path, unused_imports: typing.Iterable[JavaImport]
+def lines_with_unnecessary_imports_removed(
+    path: pathlib.Path, unnecessary_imports: typing.Iterable[JavaImport]
 ) -> typing.Iterable[str]:
     imports_by_lines = {
         k: list(v)
         for k, v in itertools.groupby(
-            sorted(unused_imports, key=lambda x: x.lineno),
+            sorted(unnecessary_imports, key=lambda x: x.lineno),
             key=lambda x: x.lineno,
         )
     }
@@ -134,22 +134,29 @@ def main(argv=None):
 
     logger = logging.getLogger(__name__)
     for path in args.file:
-        unused_imports = list(find_unused_imports(path))
-        for unused_import in unused_imports:
-            import_type = "static import" if unused_import.is_static else "import"
+        unnecessary_imports = list(find_unnecessary_imports(path))
+        for unnecessary_import in unnecessary_imports:
+            import_type = "static import" if unnecessary_import.is_static else "import"
             print(
-                "%s:%d: Unused %s '%s'"
-                % (str(path), unused_import.lineno, import_type, unused_import.name)
+                "%s:%d: Unnecessary %s '%s'"
+                % (
+                    str(path),
+                    unnecessary_import.lineno,
+                    import_type,
+                    unnecessary_import.name,
+                )
             )
 
-        if unused_imports and args.fix:
-            new_lines = list(lines_with_unused_imports_removed(path, unused_imports))
+        if unnecessary_imports and args.fix:
+            new_lines = list(
+                lines_with_unnecessary_imports_removed(path, unnecessary_imports)
+            )
             with path.open(mode="w+", encoding="utf8") as fp:
                 fp.writelines(new_lines)
             logger.info(
-                "%s: Wrote file with %d unused imports removed",
+                "%s: Wrote file with %d unnecessary imports removed",
                 str(path),
-                len(unused_imports),
+                len(unnecessary_imports),
             )
 
     return 0
