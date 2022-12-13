@@ -53,6 +53,20 @@ def find_unused_imports(path: pathlib.Path) -> typing.Iterable[JavaImport]:
 
             if match := IMPORT_PATTERN.match(line):
                 java_import = JavaImport(match, lineno)
+                if (
+                    first_import := unused_imports.get(java_import.identifier)
+                ) is not None:
+                    logger.debug(
+                        "%s:%d: Found duplicate import '%s' "
+                        "(already imported in line %d)",
+                        str(path),
+                        lineno,
+                        java_import.name,
+                        first_import.lineno,
+                    )
+                    yield java_import
+                    continue
+
                 unused_imports[java_import.identifier] = java_import
                 if java_import.is_static:
                     logger.debug(
